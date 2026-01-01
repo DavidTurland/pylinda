@@ -25,14 +25,14 @@
 
 #define hash(ptr) (((unsigned long)(ptr) >> 3) % Minimal_refCountListSize)
 
-void* Minimal_newReference2(MinimalTypeId type_id, void* ptr, char* file, int line) {
+void* Minimal_newReference2(MinimalTypeId type_id, void* ptr, const char* file, int line) {
 
     ((MinimalRefCount*)ptr)->ref_count = 1;
     ((MinimalRefCount*)ptr)->value_type = type_id;
     return ptr;
 }
 
-void Minimal_addReference2(MinimalObject ptr, char* file, int line) {
+void Minimal_addReference2(MinimalObject ptr, const char* file, int line) {
     ((MinimalRefCount*)ptr)->ref_count++;
 }
 
@@ -48,7 +48,7 @@ MinimalTypeId Minimal_getTypeId(MinimalObject ptr) {
     return ((MinimalRefCount*)ptr)->value_type;
 }
 
-void Minimal_delReference2(MinimalObject ptr, char* file, int line) {
+void Minimal_delReference2(MinimalObject ptr, const char* file, int line) {
     if(((MinimalRefCount*)ptr)->ref_count < 0) {
         return;
     }

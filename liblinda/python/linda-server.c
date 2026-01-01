@@ -97,7 +97,7 @@ static PyObject* LindaServerPython_accept(PyObject *self, PyObject* args) {
         return NULL;
     }
 
-    return PyInt_FromLong(Linda_accept(sd));
+    return PyLong_FromLong(Linda_accept(sd));
 }
 
 static PyObject* LindaServerPython_disconnect(PyObject *self, PyObject* args) {
@@ -116,7 +116,7 @@ static PyObject* LindaServerPython_connect(PyObject *self, PyObject* args) {
     sd = Linda_connect(address);
 
     if(sd > 0) {
-        return PyInt_FromLong(sd);
+        return PyLong_FromLong(sd);
     } else {
         Py_INCREF(Py_None);
         return Py_None;
@@ -165,7 +165,7 @@ static PyObject* LindaServerPython_getsockname(PyObject *self, PyObject* args) {
 
     getsockname(sd, &addr, &len);
 
-    return PyString_FromString(addr.sa_data);
+    return PyUnicode_FromString(addr.sa_data);
 }
 
 static PyObject* LindaServerPython_getpeername(PyObject *self, PyObject* args) {
@@ -180,7 +180,7 @@ static PyObject* LindaServerPython_getpeername(PyObject *self, PyObject* args) {
         fprintf(stderr, "GetPeerName Error: %s\n", strerror(errno));
     }
 
-    return PyString_FromFormat("%s:%i", inet_ntoa(((struct sockaddr_in*)&addr)->sin_addr), (int)(((struct sockaddr_in*)&addr)->sin_port));
+    return PyUnicode_FromFormat("%s:%i", inet_ntoa(((struct sockaddr_in*)&addr)->sin_addr), (int)(((struct sockaddr_in*)&addr)->sin_port));
 }
 
 static PyObject* LindaServerPython_sddisconnect(PyObject *self, PyObject* args) {
@@ -317,9 +317,19 @@ static PyMethodDef LindaServerMethods[] = {
     {NULL, NULL, 0, NULL}        /* Sentinel */
 };
 
-PyMODINIT_FUNC init_linda_server(void)
+static struct PyModuleDef linda_server_module_def = {
+    PyModuleDef_HEAD_INIT,
+    "_linda_server",
+    NULL,
+    -1,
+    LindaServerMethods
+};
+
+PyMODINIT_FUNC PyInit__linda_server(void)
 {
-    LindaServer_module = Py_InitModule("_linda_server", LindaServerMethods);
+    PyObject* m = PyModule_Create(&linda_server_module_def);
+    if (m == NULL) return NULL;
+    LindaServer_module = m;
 
 #ifdef TYPES
     PyModule_AddObject(LindaServer_module, "use_types", Py_True);
@@ -334,9 +344,11 @@ PyMODINIT_FUNC init_linda_server(void)
     PyModule_AddObject(LindaServer_module, "use_types", Py_False);
 #endif
 
-    PyModule_AddObject(LindaServer_module, "version", PyString_FromString(Linda_version));
+    PyModule_AddObject(LindaServer_module, "version", PyUnicode_FromString(Linda_version));
 
     inittsref(LindaServer_module);
     initvalue(LindaServer_module);
     inittypemap(LindaServer_module);
+
+    return m;
 }

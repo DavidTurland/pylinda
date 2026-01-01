@@ -19,6 +19,10 @@
 */
 
 %{
+#ifdef __GNUC__
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-function"
+#endif
 #include <math.h>
 
 #include "minimal_internal.h"
@@ -104,5 +108,8 @@ TEST_OP    [><]|"=="|">="|"<="
 void Minimal_nevercall() {
     unput('a');
 }
+#endif
+#ifdef __GNUC__
+#pragma GCC diagnostic pop
 #endif
 %}

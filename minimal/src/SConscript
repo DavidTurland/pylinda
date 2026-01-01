@@ -9,10 +9,22 @@ try:
 except ValueError:
     lfile = env.CFile("minimal_lex.l", LEXFLAGS="--header-file=src/yy.lex.h")
 
+# Build parser and lexer objects; compile lexer with -Wno-unused-function to silence flex-generated unused functions
+yobj = env.Object(yfile)
+lobj = env.Object(lfile, CCFLAGS=env['CCFLAGS'] + ' -Wno-unused-function')
+
 env.SideEffect("#src/yy.lex.h", lfile)
 env.Depends(yfile, "#src/yy.lex.h")
-objs = env.SharedObject([yfile, lfile, "parse.c", "layer.c", "syntax_tree.c", "refcount.c", "syntax_map.c", "core.c", "interpreter.c", "evaluate.c", "values.c", "value_funcs.c", "serialise.c", "parsexml.c", "type_list.c", "utils.c", "cyclic_garbage.c", "built_in_funcs.c"])
-interpreter = env.Object(["main.c"])
+# Build objects list explicitly so we can set per-file flags for the lexer object
+sources = ["parse.c", "layer.c", "syntax_tree.c", "refcount.c", "syntax_map.c", "core.c", "interpreter.c", "evaluate.c", "values.c", "value_funcs.c", "serialise.c", "parsexml.c", "type_list.c", "utils.c", "cyclic_garbage.c", "built_in_funcs.c"]
+ys = env.SharedObject(yfile)
+ls = env.SharedObject(lfile, CCFLAGS=env['CCFLAGS'] + ' -Wno-unused-function')
+others = env.SharedObject(sources)
+# SharedObject returns a list of nodes; extract single nodes for parser and lexer
+yobj = ys[0] if isinstance(ys, list) else ys
+lobj = ls[0] if isinstance(ls, list) else ls
+objs = [ yobj, lobj ] + others
+interpreter = env.SharedObject("main.c")
 
 #nolinda = env.SharedObject("no_linda.c")
 

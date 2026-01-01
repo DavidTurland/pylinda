@@ -49,28 +49,28 @@ typedef struct {
     /* Type-specific fields go here. */
     LindaValue ts;
 } linda_TupleSpaceObject;
-PyTypeObject linda_TupleSpaceType;
+extern PyTypeObject linda_TupleSpaceType;
 
 typedef struct {
     PyObject_HEAD
     /* Type-specific fields go here. */
     LindaValue ts;
 } linda_TSRefObject;
-PyTypeObject linda_TSRefType;
+extern PyTypeObject linda_TSRefType;
 
 typedef struct {
     PyObject_HEAD
     /* Type-specific fields go here. */
     LindaValue val;
 } linda_ValueObject;
-PyTypeObject linda_ValueType;
+extern PyTypeObject linda_ValueType;
 
 typedef struct {
     PyObject_HEAD
     /* Type-specific fields go here. */
     MinimalLayer map;
 } linda_TypeMapObject;
-PyTypeObject linda_TypeMapType;
+extern PyTypeObject linda_TypeMapType;
 
 typedef struct {
     PyObject_HEAD
@@ -78,6 +78,6 @@ typedef struct {
     unsigned char convert_to;
     PyObject* dict;
 } linda_MemoObject;
-PyTypeObject linda_MemoType;
+extern PyTypeObject linda_MemoType;
 
 #endif

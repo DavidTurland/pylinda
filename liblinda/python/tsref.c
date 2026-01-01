@@ -51,25 +51,26 @@ static int linda_TSRef_init(linda_TSRefObject* self, PyObject* args, PyObject* k
 static void linda_TSRef_dealloc(linda_TSRefObject* self)
 {
     Linda_delReference(self->ts);
-    self->ob_type->tp_free(self);
+    Py_TYPE(self)->tp_free((PyObject*)self);
 }
 
 static PyObject* linda_TSRef_str(linda_TSRefObject* self) {
     if(self->ts != NULL) {
-        return PyString_FromFormat("<TSRef %s>", Minimal_getTupleSpace(self->ts));
+        return PyUnicode_FromFormat("<TSRef %s>", Minimal_getTupleSpace(self->ts));
     } else {
-        return PyString_FromFormat("<TSRef>");
+        return PyUnicode_FromFormat("<TSRef>");
     }
 }
 
 static PyObject* linda_TSRef_repr(linda_TSRefObject* self) {
     if(self->ts != NULL) {
-        return PyString_FromFormat("<TSRef %s>", Minimal_getTupleSpace(self->ts));
+        return PyUnicode_FromFormat("<TSRef %s>", Minimal_getTupleSpace(self->ts));
     } else {
-        return PyString_FromFormat("<TSRef>");
+        return PyUnicode_FromFormat("<TSRef>");
     }
 }
 
+static long linda_TSRef_compare(linda_TSRefObject* self, linda_TSRefObject* other) __attribute__((unused));
 static long linda_TSRef_compare(linda_TSRefObject* self, linda_TSRefObject* other) {
     if(self->ts == NULL || other->ts == NULL) {
         PyErr_SetString(PyExc_TypeError, "Got null string in TSRef.");
@@ -81,7 +82,7 @@ static long linda_TSRef_compare(linda_TSRefObject* self, linda_TSRefObject* othe
 
 static long linda_TSRef_hash(linda_TSRefObject* self) {
     long r;
-    PyObject* s = PyString_FromString(Minimal_getTupleSpace(self->ts));
+    PyObject* s = PyUnicode_FromString(Minimal_getTupleSpace(self->ts));
     r = PyObject_Hash(s);
     Py_DECREF(s);
     return r;
@@ -94,7 +95,7 @@ static PyMethodDef tsref_methods[] = {
 
 static PyObject* linda_TSRef_getid(linda_TSRefObject* self, void *closure)
 {
-    return PyString_FromString(Minimal_getTupleSpace(self->ts));
+    return PyUnicode_FromString(Minimal_getTupleSpace(self->ts));
 }
 
 static PyGetSetDef tsref_getseters[] = {
@@ -103,45 +104,19 @@ static PyGetSetDef tsref_getseters[] = {
 };
 
 PyTypeObject linda_TSRefType = {
-    PyObject_HEAD_INIT(NULL)
-    0,                         /*ob_size*/
-    "linda.TSRef",        /*tp_name*/
-    sizeof(linda_TSRefObject), /*tp_basicsize*/
-    0,                         /*tp_itemsize*/
-    (destructor)linda_TSRef_dealloc,  /*tp_dealloc*/
-    0,                         /*tp_print*/
-    0,                         /*tp_getattr*/
-    0,                         /*tp_setattr*/
-    (cmpfunc)linda_TSRef_compare, /*tp_compare*/
-    (reprfunc)linda_TSRef_repr,/*tp_repr*/
-    0,                         /*tp_as_number*/
-    0,                         /*tp_as_sequence*/
-    0,                         /*tp_as_mapping*/
-    (hashfunc)linda_TSRef_hash,/*tp_hash */
-    0,                         /*tp_call*/
-    (reprfunc)linda_TSRef_str, /*tp_str*/
-    0,                         /*tp_getattro*/
-    0,                         /*tp_setattro*/
-    0,                         /*tp_as_buffer*/
-    Py_TPFLAGS_DEFAULT,        /*tp_flags*/
-    "A TupleSpace Reference",  /* tp_doc */
-    0,                         /* tp_traverse; */
-    0,                         /* tp_clear; */
-    0,                         /* tp_richcompare; */
-    0,                         /* tp_weaklistoffset; */
-    0,                         /* tp_iter; */
-    0,                         /* tp_iternext; */
-    tsref_methods,             /* tp_methods; */
-    0,                         /* tp_members */
-    tsref_getseters,           /* tp_getset */
-    0,                         /* tp_base */
-    0,                         /* tp_dict */
-    0,                         /* tp_descr_get */
-    0,                         /* tp_descr_set */
-    0,                         /* tp_dictoffset */
-    (initproc)linda_TSRef_init, /* tp_init */
-    0,                         /* tp_alloc */
-    linda_TSRef_new,      /* tp_new */
+    PyVarObject_HEAD_INIT(NULL, 0)
+    .tp_name = "linda.TSRef",
+    .tp_basicsize = sizeof(linda_TSRefObject),
+    .tp_dealloc = (destructor)linda_TSRef_dealloc,
+    .tp_repr = (reprfunc)linda_TSRef_repr,
+    .tp_hash = (hashfunc)linda_TSRef_hash,
+    .tp_str = (reprfunc)linda_TSRef_str,
+    .tp_flags = Py_TPFLAGS_DEFAULT,
+    .tp_doc = "A TupleSpace Reference",
+    .tp_methods = tsref_methods,
+    .tp_getset = tsref_getseters,
+    .tp_init = (initproc)linda_TSRef_init,
+    .tp_new = linda_TSRef_new,
 };
 
 void inittsref(PyObject* m) {

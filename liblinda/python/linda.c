@@ -50,7 +50,7 @@ static PyObject* LindaPython_disconnect(PyObject* self, PyObject* args) {
 
 static PyObject* LindaPython_getSD(PyObject* self, PyObject* args) {
     Linda_thread_data* tdata = Linda_get_thread_data();
-    return PyInt_FromLong(tdata->sd);
+    return PyLong_FromLong(tdata->sd);
 }
 
 #ifdef TYPES
@@ -175,13 +175,25 @@ static PyMethodDef LindaMethods[] = {
     {NULL, NULL, 0, NULL}        /* Sentinel */
 };
 
+static struct PyModuleDef pylinda_module =
+{
+    PyModuleDef_HEAD_INIT,
+    "_linda", /* name of module */
+    "",          /* module documentation, may be NULL */
+    -1,          /* size of per-interpreter state of the module, or -1 if the module keeps state in global variables. */
+    LindaMethods
+};
+
+
 PyMODINIT_FUNC init_linda(void)
 {
     Linda_init();
+    // https://stackoverflow.com/questions/28305731/compiler-cant-find-py-initmodule-is-it-deprecated-and-if-so-what-should-i
+    //Linda_module = Py_InitModule("_linda", LindaMethods);
 
-    Linda_module = Py_InitModule("_linda", LindaMethods);
+    Linda_module = PyModuleDef_Init(&pylinda_module);
 
-    PyModule_AddObject(Linda_module, "version", PyString_FromString(Linda_version));
+    PyModule_AddObject(Linda_module, "version", PyUnicode_FromString(Linda_version));
 
 #ifdef TYPES
     PyModule_AddObject(Linda_module, "use_types", Py_True);
@@ -202,4 +214,5 @@ PyMODINIT_FUNC init_linda(void)
     inittypemap(Linda_module);
     initregistery(Linda_module);
     initmemo(Linda_module);
+    return Linda_module;
 }

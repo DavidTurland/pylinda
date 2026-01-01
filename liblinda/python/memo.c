@@ -57,7 +57,7 @@ static void linda_Memo_dealloc(linda_MemoObject* self) {
     if(self->dict != NULL) {
         Py_DECREF(self->dict);
     }
-    self->ob_type->tp_free(self);
+    Py_TYPE(self)->tp_free((PyObject*)self);
 }
 
 static PyGetSetDef memo_getseters[] = {
@@ -76,10 +76,10 @@ static PyObject* linda_Memo_register(linda_MemoObject* self, PyObject* args) {
     Py_INCREF(arg2);
 
     if(self->convert_to) {
-        PyObject* i = PyInt_FromLong((unsigned long)arg1);
+        PyObject* i = PyLong_FromLong((unsigned long)arg1);
         PyDict_SetItem(self->dict, i, arg2);
     } else {
-        PyObject* i = PyInt_FromLong((unsigned long)((linda_ValueObject*)arg1)->val);
+        PyObject* i = PyLong_FromLong((unsigned long)((linda_ValueObject*)arg1)->val);
         PyDict_SetItem(self->dict, i, arg2);
     }
 
@@ -101,7 +101,7 @@ static PyObject* linda_Memo_getValue(linda_MemoObject* self, PyObject* args) {
         return NULL;
     }
 
-    i = PyInt_FromLong((unsigned long)arg);
+    i = PyLong_FromLong((unsigned long)arg);
     r = PyDict_GetItem(self->dict, i);
     if(r == NULL) {
         return NULL;
@@ -125,7 +125,7 @@ static PyObject* linda_Memo_getReal(linda_MemoObject* self, PyObject* args) {
         return NULL;
     }
 
-    i = PyInt_FromLong((unsigned long)((linda_ValueObject*)arg)->val);
+    i = PyLong_FromLong((unsigned long)((linda_ValueObject*)arg)->val);
     r = PyDict_GetItem(self->dict, i);
     if(r == NULL) {
         PyErr_SetString(PyExc_KeyError, "Couldn't find value in memo.");
@@ -144,45 +144,16 @@ static PyMethodDef memo_methods[] = {
 };
 
 PyTypeObject linda_MemoType = {
-    PyObject_HEAD_INIT(NULL)
-    0,                         /*ob_size*/
-    "linda.Memo",        /*tp_name*/
-    sizeof(linda_MemoObject), /*tp_basicsize*/
-    0,                         /*tp_itemsize*/
-    (destructor)linda_Memo_dealloc,  /*tp_dealloc*/
-    0,                         /*tp_print*/
-    0,                         /*tp_getattr*/
-    0,                         /*tp_setattr*/
-    0,  /*tp_compare*/
-    0,/*tp_repr*/
-    0,                         /*tp_as_number*/
-    0,            /*tp_as_sequence*/
-    0,                         /*tp_as_mapping*/
-    0,                         /*tp_hash */
-    0,                         /*tp_call*/
-    0, /*tp_str*/
-    0,                         /*tp_getattro*/
-    0,                         /*tp_setattro*/
-    0,                         /*tp_as_buffer*/
-    Py_TPFLAGS_DEFAULT,        /*tp_flags*/
-    "A Linda Memo object",           /* tp_doc */
-    0,                         /* tp_traverse; */
-    0,                         /* tp_clear; */
-    0,                         /* tp_richcompare; */
-    0,                         /* tp_weaklistoffset; */
-    0,                         /* tp_iter; */
-    0,                         /* tp_iternext; */
-    memo_methods,             /* tp_methods; */
-    0,                         /* tp_members */
-    memo_getseters,           /* tp_getset */
-    0,                         /* tp_base */
-    0,                         /* tp_dict */
-    0,                         /* tp_descr_get */
-    0,                         /* tp_descr_set */
-    0,                         /* tp_dictoffset */
-    (initproc)linda_Memo_init, /* tp_init */
-    0,                         /* tp_alloc */
-    linda_Memo_new,      /* tp_new */
+    PyVarObject_HEAD_INIT(NULL, 0)
+    .tp_name = "linda.Memo",
+    .tp_basicsize = sizeof(linda_MemoObject),
+    .tp_dealloc = (destructor)linda_Memo_dealloc,
+    .tp_flags = Py_TPFLAGS_DEFAULT,
+    .tp_doc = "A Linda Memo object",
+    .tp_methods = memo_methods,
+    .tp_getset = memo_getseters,
+    .tp_init = (initproc)linda_Memo_init,
+    .tp_new = linda_Memo_new,
 };
 
 void initmemo(PyObject* m) {

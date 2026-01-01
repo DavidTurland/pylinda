@@ -334,7 +334,7 @@ Minimal_SyntaxTree Minimal_SyntaxTree_createFunctionDef(Minimal_SyntaxTree name,
 }
 
 void Minimal_SyntaxTree_addToTuple(Minimal_SyntaxTree tuple, Minimal_SyntaxTree tree) {
-    if(tuple->type != M_SYNTAX_TREE && tuple->type != ST_TUPLE) {
+    if(tuple->type != ST_TUPLE) {
         fprintf(stderr, "Invalid type to Minimal_SyntaxTree_addToTuple %i\n", tuple->type);
         return;
     }

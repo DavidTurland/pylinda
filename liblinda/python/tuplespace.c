@@ -264,7 +264,7 @@ static PyObject* linda_TupleSpace_collect(linda_TupleSpaceObject* self, PyObject
         PyErr_SetString(PyExc_KeyboardInterrupt, "Linda message interupted");
         return NULL;
     } else {
-        return PyInt_FromLong(r);
+        return PyLong_FromLong(r);
     }
 }
 
@@ -301,18 +301,20 @@ static PyObject* linda_TupleSpace_copy_collect(linda_TupleSpaceObject* self, PyO
         PyErr_SetString(PyExc_KeyboardInterrupt, "Linda message interupted");
         return NULL;
     } else {
-        return PyInt_FromLong(r);
+        return PyLong_FromLong(r);
     }
 }
 
 static void linda_TupleSpace_dealloc(linda_TupleSpaceObject* self)
 {
     Linda_delReference(self->ts);
-    self->ob_type->tp_free(self);
+    // https://docs.python.org/3/extending/newtypes_tutorial.html
+    Py_TYPE(self)->tp_free(self);
+    //self->ob_type->tp_free(self);
 }
 
 static PyObject* linda_TupleSpace_str(linda_TupleSpaceObject* self) {
-    return PyString_FromFormat("<TupleSpace %s>", Minimal_getTupleSpace(self->ts));
+    return PyUnicode_FromFormat("<TupleSpace %s>", Minimal_getTupleSpace(self->ts));
 }
 
 static PyMethodDef tuplespace_methods[] = {
@@ -327,7 +329,7 @@ static PyMethodDef tuplespace_methods[] = {
 };
 
 static PyObject* linda_TupleSpace_getid(linda_TupleSpaceObject *self, void *closure) {
-    return PyString_FromString(Minimal_getTupleSpace(self->ts));
+    return PyUnicode_FromString(Minimal_getTupleSpace(self->ts));
 }
 
 static PyGetSetDef tuplespace_getseters[] = {
@@ -335,47 +337,92 @@ static PyGetSetDef tuplespace_getseters[] = {
     {NULL}  /* Sentinel */
 };
 
+
 PyTypeObject linda_TupleSpaceType = {
-    PyObject_HEAD_INIT(NULL)
-    0,                         /*ob_size*/
-    "linda.TupleSpace",        /*tp_name*/
-    sizeof(linda_TupleSpaceObject), /*tp_basicsize*/
-    0,                         /*tp_itemsize*/
-    (destructor)linda_TupleSpace_dealloc,  /*tp_dealloc*/
-    0,                         /*tp_print*/
-    0,                         /*tp_getattr*/
-    0,                         /*tp_setattr*/
-    0,                         /*tp_compare*/
-    0,                         /*tp_repr*/
-    0,                         /*tp_as_number*/
-    0,                         /*tp_as_sequence*/
-    0,                         /*tp_as_mapping*/
-    0,                         /*tp_hash */
-    0,                         /*tp_call*/
-    (reprfunc)linda_TupleSpace_str, /*tp_str*/
-    0,                         /*tp_getattro*/
-    0,                         /*tp_setattro*/
-    0,                         /*tp_as_buffer*/
-    Py_TPFLAGS_DEFAULT,        /*tp_flags*/
-    "A TupleSpace",            /* tp_doc */
-    0,                         /* tp_traverse; */
-    0,                         /* tp_clear; */
-    0,                         /* tp_richcompare; */
-    0,                         /* tp_weaklistoffset; */
-    0,                         /* tp_iter; */
-    0,                         /* tp_iternext; */
-    tuplespace_methods,        /* tp_methods; */
-    0,                         /* tp_members */
-    tuplespace_getseters,      /* tp_getset */
-    0,                         /* tp_base */
-    0,                         /* tp_dict */
-    0,                         /* tp_descr_get */
-    0,                         /* tp_descr_set */
-    0,                         /* tp_dictoffset */
-    (initproc)linda_TupleSpace_init, /* tp_init */
-    0,                         /* tp_alloc */
-    linda_TupleSpace_new,      /* tp_new */
+    .ob_base = PyVarObject_HEAD_INIT(NULL, 0)
+    // 0,                         /*ob_size*/
+    .tp_name = "linda.TupleSpace",        /*tp_name*/
+    .tp_basicsize = sizeof(linda_TupleSpaceObject), /*tp_basicsize*/
+    // 0,                         /*tp_itemsize*/
+    .tp_dealloc = (destructor)linda_TupleSpace_dealloc,  /*tp_dealloc*/
+    // 0,                         /*tp_print*/
+    // 0,                         /*tp_getattr*/
+    // 0,                         /*tp_setattr*/
+    // 0,                         /*tp_compare*/
+    // 0,                         /*tp_repr*/
+    // 0,                         /*tp_as_number*/
+    // 0,                         /*tp_as_sequence*/
+    // 0,                         /*tp_as_mapping*/
+    // 0,                         /*tp_hash */
+    // 0,                         /*tp_call*/
+    .tp_str = (reprfunc)linda_TupleSpace_str, /*tp_str*/
+    // 0,                         /*tp_getattro*/
+    // 0,                         /*tp_setattro*/
+    // 0,                         /*tp_as_buffer*/
+    .tp_flags= Py_TPFLAGS_DEFAULT,        /*tp_flags*/
+    .tp_doc = "A TupleSpace",            /* tp_doc */
+    // 0,                         /* tp_traverse; */
+    // 0,                         /* tp_clear; */
+    // 0,                         /* tp_richcompare; */
+    // 0,                         /* tp_weaklistoffset; */
+    // 0,                         /* tp_iter; */
+    // 0,                         /* tp_iternext; */
+    .tp_methods = tuplespace_methods,        /* tp_methods; */
+    // 0,                         /* tp_members */
+    .tp_getset = tuplespace_getseters,      /* tp_getset */
+    // 0,                         /* tp_base */
+    // 0,                         /* tp_dict */
+    // 0,                         /* tp_descr_get */
+    // 0,                         /* tp_descr_set */
+    // 0,                         /* tp_dictoffset */
+    .tp_init = (initproc)linda_TupleSpace_init, /* tp_init */
+    // 0,                         /* tp_alloc */
+    .tp_new = linda_TupleSpace_new,      /* tp_new */
 };
+
+
+
+// PyTypeObject Old_linda_TupleSpaceType = {
+//     PyObject_HEAD_INIT(NULL)
+//     0,                         /*ob_size*/
+//     "linda.TupleSpace",        /*tp_name*/
+//     sizeof(linda_TupleSpaceObject), /*tp_basicsize*/
+//     0,                         /*tp_itemsize*/
+//     (destructor)linda_TupleSpace_dealloc,  /*tp_dealloc*/
+//     0,                         /*tp_print*/
+//     0,                         /*tp_getattr*/
+//     0,                         /*tp_setattr*/
+//     0,                         /*tp_compare*/
+//     0,                         /*tp_repr*/
+//     0,                         /*tp_as_number*/
+//     0,                         /*tp_as_sequence*/
+//     0,                         /*tp_as_mapping*/
+//     0,                         /*tp_hash */
+//     0,                         /*tp_call*/
+//     (reprfunc)linda_TupleSpace_str, /*tp_str*/
+//     0,                         /*tp_getattro*/
+//     0,                         /*tp_setattro*/
+//     0,                         /*tp_as_buffer*/
+//     Py_TPFLAGS_DEFAULT,        /*tp_flags*/
+//     "A TupleSpace",            /* tp_doc */
+//     0,                         /* tp_traverse; */
+//     0,                         /* tp_clear; */
+//     0,                         /* tp_richcompare; */
+//     0,                         /* tp_weaklistoffset; */
+//     0,                         /* tp_iter; */
+//     0,                         /* tp_iternext; */
+//     tuplespace_methods,        /* tp_methods; */
+//     0,                         /* tp_members */
+//     tuplespace_getseters,      /* tp_getset */
+//     0,                         /* tp_base */
+//     0,                         /* tp_dict */
+//     0,                         /* tp_descr_get */
+//     0,                         /* tp_descr_set */
+//     0,                         /* tp_dictoffset */
+//     (initproc)linda_TupleSpace_init, /* tp_init */
+//     0,                         /* tp_alloc */
+//     linda_TupleSpace_new,      /* tp_new */
+// };
 
 void inittuplespace(PyObject* m) {
     linda_TupleSpaceObject* uts;

@@ -24,7 +24,7 @@
 
 #include "linda_python.h"
 
-PyObject* Linda_module;
+extern PyObject* Linda_module;
 
 PyObject* dict_to = NULL;
 PyObject* dict_from = NULL;

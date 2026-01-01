@@ -95,7 +95,7 @@ static inline void Minimal_SyntaxMap_init(Minimal_NameValueMap* map) {
 
 #define Minimal_newReference(type_id, ptr_type, val_type) ((ptr_type)Minimal_newReference2(type_id, malloc(sizeof(val_type)), __FILE__, __LINE__))
 
-void* Minimal_newReference2(MinimalTypeId type_id, void* ptr, char* file, int line);
+void* Minimal_newReference2(MinimalTypeId type_id, void* ptr, const char* file, int line);
 
 void Minimal_performCyclicCollection(MinimalObject ptr);
 

@@ -28,7 +28,7 @@ Export("env")
 objs, interpreter = SConscript("src/SConscript")
 cpp = SConscript("bindings/SConscript")
 
-lib = env.SharedLibrary("minimal", objs, LIBS=["fl", "xml2"])
+lib = env.SharedLibrary("minimal", objs, LIBS=["fl", "xml2"] + readline)
 lib = env.SharedLibrary("minimal++", cpp, LIBS=["minimal"])
 #nolindalib = env.SharedLibrary("minimal_nolinda", nolinda)
 Export("lib")

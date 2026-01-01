@@ -342,10 +342,10 @@ EXPORT MinimalValue Minimal_evaluate(Minimal_SyntaxTree code, MinimalLayer layer
 EXPORT MinimalValue Minimal_getFunction(char* funcname);
 
 #define Minimal_addReference(obj) Minimal_addReference2(obj, __FILE__, __LINE__);
-EXPORT void Minimal_addReference2(MinimalObject ptr, char* file, int line);
+EXPORT void Minimal_addReference2(MinimalObject ptr, const char* file, int line);
 EXPORT int Minimal_getReferenceCount(MinimalObject ptr);
 #define Minimal_delReference(ptr) Minimal_delReference2(ptr, __FILE__, __LINE__);
-EXPORT void Minimal_delReference2(MinimalObject ptr, char* file, int line);
+EXPORT void Minimal_delReference2(MinimalObject ptr, const char* file, int line);
 EXPORT MinimalValue Minimal_copy(MinimalValue v);
 
 EXPORT MinimalLayer Minimal_getCurrentLayer();

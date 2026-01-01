@@ -38,7 +38,8 @@ int main(int argc, char* argv[]) {
         size = ftell(fp);
         code = (char*)malloc(size+1);
         fseek(fp, 0, SEEK_SET);
-        fread(code, 1, size, fp);
+        size_t _r = fread(code, 1, size, fp);
+        (void)_r;
         code[size] = '\0';
         fclose(fp);
 

@@ -55,7 +55,7 @@ static void linda_TypeMap_dealloc(linda_TypeMapObject* self) {
     if(self->map != NULL) {
         Linda_delReference((void*)(self->map));
     }
-    self->ob_type->tp_free(self);
+    Py_TYPE(self)->tp_free((PyObject*)self);
 }
 
 static PyGetSetDef typemap_getseters[] = {
@@ -71,12 +71,12 @@ static PyObject* linda_TypeMapSubScript(linda_TypeMapObject* self, PyObject* arg
     char* name;
     LindaValue v;
 
-    if(!PyString_Check(arg)) {
+    if(!PyUnicode_Check(arg)) {
         PyErr_SetString(PyExc_TypeError, "Must be string");
         return NULL;
     }
 
-    name = PyString_AsString(arg);
+    name = (char*)PyUnicode_AsUTF8(arg);
 
     v = Minimal_getName(self->map, name);
     if(v != NULL) {
@@ -96,7 +96,7 @@ static void find_names(struct Minimal_NameValueMap_t* map, PyObject* list) {
     if(map == NULL) {
         return;
     } else if(map->name != NULL) {
-        PyList_Append(list, PyString_FromString(map->name));
+        PyList_Append(list, PyUnicode_FromString(map->name));
     }
     find_names(map->left, list);
     find_names(map->right, list);
@@ -116,45 +116,17 @@ static PyMethodDef typemap_methods[] = {
 };
 
 PyTypeObject linda_TypeMapType = {
-    PyObject_HEAD_INIT(NULL)
-    0,                         /*ob_size*/
-    "linda.TypeMap",        /*tp_name*/
-    sizeof(linda_TypeMapObject), /*tp_basicsize*/
-    0,                         /*tp_itemsize*/
-    (destructor)linda_TypeMap_dealloc,  /*tp_dealloc*/
-    0,                         /*tp_print*/
-    0,                         /*tp_getattr*/
-    0,                         /*tp_setattr*/
-    0,  /*tp_compare*/
-    0,/*tp_repr*/
-    0,                         /*tp_as_number*/
-    0,            /*tp_as_sequence*/
-    &linda_TypeMapMappingMethods,                         /*tp_as_mapping*/
-    0,                         /*tp_hash */
-    0,                         /*tp_call*/
-    0, /*tp_str*/
-    0,                         /*tp_getattro*/
-    0,                         /*tp_setattro*/
-    0,                         /*tp_as_buffer*/
-    Py_TPFLAGS_DEFAULT,        /*tp_flags*/
-    "A Linda Type Map",           /* tp_doc */
-    0,                         /* tp_traverse; */
-    0,                         /* tp_clear; */
-    0,                         /* tp_richcompare; */
-    0,                         /* tp_weaklistoffset; */
-    0,                         /* tp_iter; */
-    0,                         /* tp_iternext; */
-    typemap_methods,             /* tp_methods; */
-    0,                         /* tp_members */
-    typemap_getseters,           /* tp_getset */
-    0,                         /* tp_base */
-    0,                         /* tp_dict */
-    0,                         /* tp_descr_get */
-    0,                         /* tp_descr_set */
-    0,                         /* tp_dictoffset */
-    (initproc)linda_TypeMap_init, /* tp_init */
-    0,                         /* tp_alloc */
-    linda_TypeMap_new,      /* tp_new */
+    PyVarObject_HEAD_INIT(NULL, 0)
+    .tp_name = "linda.TypeMap",
+    .tp_basicsize = sizeof(linda_TypeMapObject),
+    .tp_dealloc = (destructor)linda_TypeMap_dealloc,
+    .tp_as_mapping = &linda_TypeMapMappingMethods,
+    .tp_flags = Py_TPFLAGS_DEFAULT,
+    .tp_doc = "A Linda Type Map",
+    .tp_methods = typemap_methods,
+    .tp_getset = typemap_getseters,
+    .tp_init = (initproc)linda_TypeMap_init,
+    .tp_new = linda_TypeMap_new,
 };
 
 void inittypemap(PyObject* m) {

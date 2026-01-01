@@ -21,6 +21,7 @@
 #include <iostream>
 
 #include "linda.h"
+#include <cstring>
 
 namespace Linda {
 

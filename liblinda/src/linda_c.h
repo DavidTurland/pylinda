@@ -160,10 +160,10 @@ static inline void Linda_setPtr(LindaValue v, LindaValue v2) { return Minimal_se
 
 static inline LindaValue Linda_copy(LindaValue v) { return Minimal_copy(v); }
 
-#define Linda_addReference(obj) Linda_addReference2(obj, __FILE__, __LINE__);
+#define Linda_addReference(obj) Linda_addReference2(obj, (char *)__FILE__, __LINE__);
 static inline void Linda_addReference2(LindaValue v, char* file, int line) { Minimal_addReference2(v, file, line); }
 static inline int Linda_getReferenceCount(LindaValue v) { return Minimal_getReferenceCount(v); }
-#define Linda_delReference(ptr) Linda_delReference2(ptr, __FILE__, __LINE__);
+#define Linda_delReference(ptr) Linda_delReference2(ptr, (char *)__FILE__, __LINE__);
 static inline void Linda_delReference2(LindaValue v, char* file, int line) { Minimal_delReference2(v, file, line); }
 
 static inline LindaValue Linda_apply(LindaValue func, LindaValue args) { return Minimal_apply(func, args); }

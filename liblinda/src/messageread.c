@@ -108,16 +108,17 @@ Message* Message_recv(int s) {
 #endif
 
     doc = xmlReadMemory(buf, bytesread, NULL, NULL, 0);
-    free(buf);
     if(doc == NULL) {
         int i;
-        for(i = 0; i < bytesrecv; i++) {
+        for(i = 0; i < bytesread; i++) {
             printf("%c", buf[i]);
         }
         printf("\n");
         fprintf(stderr, "XML Parser Error!\n");
+        free(buf);
         exit(-1);
     }
+    free(buf);
 
     root = xmlDocGetRootElement(doc);
 
