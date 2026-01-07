@@ -49,20 +49,21 @@ void Minimal_addName(Minimal_NameValueMap* map, char* name, MinimalValue tree) {
         MinimalValue old = map->value;
         map->value = tree;
         Minimal_delReference(old);
-    } else if(strcmp(map->name, name) == -1) {
+    } else if(strcmp(map->name, name) < 0) {
         if(map->left == NULL) {
             map->left = (Minimal_NameValueMap*)malloc(sizeof(struct Minimal_NameValueMap_t));
             Minimal_SyntaxMap_init(map->left);
         }
         Minimal_addName(map->left, name, tree);
-    } else if(strcmp(map->name, name) == 1) {
+    } else if(strcmp(map->name, name) > 0) {
         if(map->right == NULL) {
             map->right = (Minimal_NameValueMap*)malloc(sizeof(struct Minimal_NameValueMap_t));
             Minimal_SyntaxMap_init(map->right);
         }
         Minimal_addName(map->right, name, tree);
     } else {
-        fprintf(stderr, "Minimal Error: Failed to add name. This should never happen.\n");
+        int res = strcmp(map->name, name);
+        fprintf(stderr, "Minimal Error: Failed to add name. This should never happen %d.\n",res);
     }
 }
 

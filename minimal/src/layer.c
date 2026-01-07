@@ -46,7 +46,8 @@ void Minimal_Layer_refCheck(Minimal_NameValueMap* map) {
 
 void Minimal_Layer_finalise() {
     Minimal_delReference(Minimal_defaultLayer); Minimal_defaultLayer = NULL;
-    Minimal_delReference(Minimal_currentLayer); Minimal_currentLayer = NULL;
+    // Minimal_delReference(Minimal_currentLayer); Minimal_currentLayer = NULL;
+    Minimal_currentLayer = NULL;
 }
 
 MinimalLayer Minimal_setCurrentLayer(MinimalLayer layer) {
